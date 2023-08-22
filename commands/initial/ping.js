@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-nodule.exports = {
+module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ping')
 		.setDescription('Replies with Pong!'),
