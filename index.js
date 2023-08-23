@@ -33,34 +33,47 @@ for (const folder of commandFolders) {
 	}
 }
 
-// When the client is ready, run this code(only once)
-// We use 'c' for the event parameter to keep it seperate from the already defined 'client' // eslint-disable-next-line no-unused-vars
-client.once(Events.ClientReady, () => {
-	console.log('Ready!');
-});
+const eventPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
-//Create listener for interactions
-client.on(Events.InteractionCreate, async interaction => {
-	if (!interaction.isChatInputCommand()) return;
-
-	const command = interaction.client.commands.get(interaction.commandName);
-
-	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
-		return;
+for( const file of eventFiles){
+	const filePath = path.join(eventPath, file);
+	const event = require(filePath);
+	if(event.once){
+		client.once(event.name, (...args) => event.execute(...args));
+	}else{
+		client.on(event.name, (...args) => event.execute(...args));
 	}
+}
 
-	try {
-		await command.execute(interaction);
-	} catch (error) {
-		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-		} else {
-			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-		}
-	}
-});
+// // When the client is ready, run this code(only once)
+// // We use 'c' for the event parameter to keep it seperate from the already defined 'client' // eslint-disable-next-line no-unused-vars
+// client.once(Events.ClientReady, () => {
+// 	console.log('Ready!');
+// });
+
+// //Create listener for interactions
+// client.on(Events.InteractionCreate, async interaction => {
+// 	if (!interaction.isChatInputCommand()) return;
+
+// 	const command = interaction.client.commands.get(interaction.commandName);
+
+// 	if (!command) {
+// 		console.error(`No command matching ${interaction.commandName} was found.`);
+// 		return;
+// 	}
+
+// 	try {
+// 		await command.execute(interaction);
+// 	} catch (error) {
+// 		console.error(error);
+// 		if (interaction.replied || interaction.deferred) {
+// 			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+// 		} else {
+// 			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+// 		}
+// 	}
+// });
 
 
 // Log in to Discord with your client's token
